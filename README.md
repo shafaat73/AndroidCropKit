@@ -1,14 +1,11 @@
-[![CanHub](.documentation/art/cover.png?raw=true)](https://github.com/canhub)
 
-Android Image Cropper
+Android Crop Kit
 =====================
 
 - **Powerful** (Zoom, Rotation, Multi-Source)
 - **Customizable** (Shape, Limits, Style)
 - **Optimized** (Async, Sampling, Matrix)
 - **Simple** image cropping library for Android
-
-![Crop demo](.documentation/art/showcase-1.gif?raw=true)
 
 ## Add to your project
 
