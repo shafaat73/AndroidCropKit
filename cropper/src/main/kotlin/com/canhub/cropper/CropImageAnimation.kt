@@ -15,8 +15,7 @@ import android.widget.ImageView
 internal class CropImageAnimation(
   private val imageView: ImageView,
   private val cropOverlayView: CropOverlayView,
-) : Animation(),
-  AnimationListener {
+) : Animation(), AnimationListener {
 
   private val startBoundPoints = FloatArray(8)
   private val endBoundPoints = FloatArray(8)

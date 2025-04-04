@@ -21,5 +21,7 @@ class ContractTestFragment(
     cropImage.launch(input)
   }
 
-  fun cropImageIntent(input: CropImageContractOptions): Intent = cropImage.contract.createIntent(requireContext(), input)
+  fun cropImageIntent(input: CropImageContractOptions): Intent {
+    return cropImage.contract.createIntent(requireContext(), input)
+  }
 }

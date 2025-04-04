@@ -11,6 +11,7 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
+import android.os.Environment
 import android.util.Log
 import android.util.Pair
 import androidx.exifinterface.media.ExifInterface
@@ -127,33 +128,35 @@ internal object BitmapUtils {
     uri: Uri,
     reqWidth: Int,
     reqHeight: Int,
-  ): BitmapSampled = try {
-    val resolver = context.contentResolver
-    // First decode with inJustDecodeBounds=true to check dimensions
-    val options = decodeImageForOption(resolver, uri)
-    if (options.outWidth == -1 && options.outHeight == -1) throw RuntimeException("File is not a picture")
-    // Calculate inSampleSize
-    options.inSampleSize = max(
-      calculateInSampleSizeByRequestedSize(
-        width = options.outWidth,
-        height = options.outHeight,
-        reqWidth = reqWidth,
-        reqHeight = reqHeight,
-      ),
-      calculateInSampleSizeByMaxTextureSize(
-        width = options.outWidth,
-        height = options.outHeight,
-      ),
-    )
-    // Decode bitmap with inSampleSize set
-    val bitmap = decodeImage(
-      resolver = resolver,
-      uri = uri,
-      options = options,
-    )
-    BitmapSampled(bitmap, options.inSampleSize)
-  } catch (e: Exception) {
-    throw CropException.FailedToLoadBitmap(uri, e.message)
+  ): BitmapSampled {
+    return try {
+      val resolver = context.contentResolver
+      // First decode with inJustDecodeBounds=true to check dimensions
+      val options = decodeImageForOption(resolver, uri)
+      if (options.outWidth == -1 && options.outHeight == -1) throw RuntimeException("File is not a picture")
+      // Calculate inSampleSize
+      options.inSampleSize = max(
+        calculateInSampleSizeByRequestedSize(
+          width = options.outWidth,
+          height = options.outHeight,
+          reqWidth = reqWidth,
+          reqHeight = reqHeight,
+        ),
+        calculateInSampleSizeByMaxTextureSize(
+          width = options.outWidth,
+          height = options.outHeight,
+        ),
+      )
+      // Decode bitmap with inSampleSize set
+      val bitmap = decodeImage(
+        resolver = resolver,
+        uri = uri,
+        options = options,
+      )
+      BitmapSampled(bitmap, options.inSampleSize)
+    } catch (e: Exception) {
+      throw CropException.FailedToLoadBitmap(uri, e.message)
+    }
   }
 
   /**
@@ -217,7 +220,7 @@ internal object BitmapUtils {
     scale: Float,
     flipHorizontally: Boolean,
     flipVertically: Boolean,
-  ): Bitmap {
+  ): Bitmap? {
     // get the rectangle in original image that contains the required cropped area (larger for non-
     // rectangular crop)
     val rect = getRectFromPoints(
@@ -322,42 +325,58 @@ internal object BitmapUtils {
   /**
    * Get left value of the bounding rectangle of the given points.
    */
-  fun getRectLeft(points: FloatArray): Float = min(min(min(points[0], points[2]), points[4]), points[6])
+  fun getRectLeft(points: FloatArray): Float {
+    return min(min(min(points[0], points[2]), points[4]), points[6])
+  }
 
   /**
    * Get top value of the bounding rectangle of the given points.
    */
-  fun getRectTop(points: FloatArray): Float = min(min(min(points[1], points[3]), points[5]), points[7])
+  fun getRectTop(points: FloatArray): Float {
+    return min(min(min(points[1], points[3]), points[5]), points[7])
+  }
 
   /**
    * Get right value of the bounding rectangle of the given points.
    */
-  fun getRectRight(points: FloatArray): Float = max(max(max(points[0], points[2]), points[4]), points[6])
+  fun getRectRight(points: FloatArray): Float {
+    return max(max(max(points[0], points[2]), points[4]), points[6])
+  }
 
   /**
    * Get bottom value of the bounding rectangle of the given points.
    */
-  fun getRectBottom(points: FloatArray): Float = max(max(max(points[1], points[3]), points[5]), points[7])
+  fun getRectBottom(points: FloatArray): Float {
+    return max(max(max(points[1], points[3]), points[5]), points[7])
+  }
 
   /**
    * Get width of the bounding rectangle of the given points.
    */
-  fun getRectWidth(points: FloatArray): Float = getRectRight(points) - getRectLeft(points)
+  fun getRectWidth(points: FloatArray): Float {
+    return getRectRight(points) - getRectLeft(points)
+  }
 
   /**
    * Get height of the bounding rectangle of the given points.
    */
-  fun getRectHeight(points: FloatArray): Float = getRectBottom(points) - getRectTop(points)
+  fun getRectHeight(points: FloatArray): Float {
+    return getRectBottom(points) - getRectTop(points)
+  }
 
   /**
    * Get horizontal center value of the bounding rectangle of the given points.
    */
-  fun getRectCenterX(points: FloatArray): Float = (getRectRight(points) + getRectLeft(points)) / 2f
+  fun getRectCenterX(points: FloatArray): Float {
+    return (getRectRight(points) + getRectLeft(points)) / 2f
+  }
 
   /**
    * Get vertical center value of the bounding rectangle of the given points.
    */
-  fun getRectCenterY(points: FloatArray): Float = (getRectBottom(points) + getRectTop(points)) / 2f
+  fun getRectCenterY(points: FloatArray): Float {
+    return (getRectBottom(points) + getRectTop(points)) / 2f
+  }
 
   /**
    * Get a rectangle for the given 4 points (x0,y0,x1,y1,x2,y2,x3,y3) by finding the min/max 2
@@ -438,7 +457,7 @@ internal object BitmapUtils {
   ): Uri {
     val newUri = customOutputUri ?: buildUri(context, compressFormat)
 
-    return context.contentResolver.openOutputStream(newUri, WRITE_AND_TRUNCATE)!!.use {
+    return context.contentResolver.openOutputStream(newUri, WRITE_AND_TRUNCATE).use {
       bitmap.compress(compressFormat, compressQuality, it)
       newUri
     }
@@ -456,8 +475,18 @@ internal object BitmapUtils {
       }
       // We have this because of a HUAWEI path bug when we use getUriForFile
       if (SDK_INT >= 29) {
-        val file = File.createTempFile("cropped", ext, context.cacheDir)
-        getUriForFile(context, file)
+        try {
+          val file = File.createTempFile(
+            "cropped",
+            ext,
+            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+          )
+          getUriForFile(context, file)
+        } catch (e: Exception) {
+          Log.e("AIC", "${e.message}")
+          val file = File.createTempFile("cropped", ext, context.cacheDir)
+          getUriForFile(context, file)
+        }
       } else {
         Uri.fromFile(File.createTempFile("cropped", ext, context.cacheDir))
       }
@@ -672,12 +701,14 @@ internal object BitmapUtils {
    * Decode image from uri using "inJustDecodeBounds" to get the image dimensions.
    */
   @Throws(FileNotFoundException::class)
-  private fun decodeImageForOption(resolver: ContentResolver, uri: Uri): BitmapFactory.Options = resolver.openInputStream(uri).use {
-    val options = BitmapFactory.Options()
-    options.inJustDecodeBounds = true
-    BitmapFactory.decodeStream(it, EMPTY_RECT, options)
-    options.inJustDecodeBounds = false
-    options
+  private fun decodeImageForOption(resolver: ContentResolver, uri: Uri): BitmapFactory.Options {
+    return resolver.openInputStream(uri).use {
+      val options = BitmapFactory.Options()
+      options.inJustDecodeBounds = true
+      BitmapFactory.decodeStream(it, EMPTY_RECT, options)
+      options.inJustDecodeBounds = false
+      options
+    }
   }
 
   /**
@@ -759,14 +790,14 @@ internal object BitmapUtils {
    * Note: rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping.
    */
   private fun cropForRotatedImage(
-    bitmap: Bitmap,
+    bitmap: Bitmap?,
     cropPoints: FloatArray,
     rect: Rect,
     degreesRotated: Int,
     fixAspectRatio: Boolean,
     aspectRatioX: Int,
     aspectRatioY: Int,
-  ): Bitmap {
+  ): Bitmap? {
     var tempBitmap = bitmap
     if (degreesRotated % 90 != 0) {
       var adjLeft = 0
@@ -792,14 +823,14 @@ internal object BitmapUtils {
       }
       val bitmapTmp = tempBitmap
       tempBitmap = Bitmap.createBitmap(
-        bitmap,
+        bitmap!!,
         rect.left,
         rect.top,
         rect.width(),
         rect.height(),
       )
       if (bitmapTmp != tempBitmap) {
-        bitmapTmp.recycle()
+        bitmapTmp?.recycle()
       }
     }
     return tempBitmap
@@ -857,20 +888,22 @@ internal object BitmapUtils {
     degrees: Int,
     flipHorizontally: Boolean,
     flipVertically: Boolean,
-  ): Bitmap = if (degrees > 0 || flipHorizontally || flipVertically) {
-    val matrix = Matrix()
-    matrix.setRotate(degrees.toFloat())
-    matrix.postScale(
-      (if (flipHorizontally) -1 else 1).toFloat(),
-      (if (flipVertically) -1 else 1).toFloat(),
-    )
-    val newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
-    if (newBitmap != bitmap) {
-      bitmap.recycle()
+  ): Bitmap {
+    return if (degrees > 0 || flipHorizontally || flipVertically) {
+      val matrix = Matrix()
+      matrix.setRotate(degrees.toFloat())
+      matrix.postScale(
+        (if (flipHorizontally) -1 else 1).toFloat(),
+        (if (flipVertically) -1 else 1).toFloat(),
+      )
+      val newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, false)
+      if (newBitmap != bitmap) {
+        bitmap.recycle()
+      }
+      newBitmap
+    } else {
+      bitmap
     }
-    newBitmap
-  } else {
-    bitmap
   }
   // Only need to check for width since opengl textures are always squared
   // Keep track of the maximum texture size

@@ -9,4 +9,8 @@
     <string name="pick_image_chooser_title">Select source</string>
     <string name="pick_image_camera">Camera</string>
     <string name="pick_image_gallery">Gallery</string>
+    <string name="permission_required_text">Permission Required</string>
+    <string name="camera_permission_text">Camera permission is required for this feature. Please enable it in settings.</string>
+    <string name="go_to_setting">Open Settings</string>
+    <string name="cancel">Cancel</string>
 </resources>

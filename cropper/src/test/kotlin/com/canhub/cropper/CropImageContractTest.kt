@@ -17,7 +17,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@Suppress("DEPRECATION")
 @RunWith(AndroidJUnit4::class)
 class CropImageContractTest {
 

@@ -3,9 +3,10 @@ plugins {
   id("org.jetbrains.kotlin.android")
   id("com.android.library")
   id("org.jetbrains.kotlin.plugin.parcelize")
-  id("com.vanniktech.maven.publish")
   id("app.cash.licensee")
   id("app.cash.paparazzi")
+  id("maven-publish")
+  id("signing")
 }
 
 licensee {
@@ -37,7 +38,9 @@ android {
   }
 
   testOptions {
-    unitTests.isIncludeAndroidResources = true
+    unitTests {
+      isIncludeAndroidResources = true
+    }
   }
 }
 
@@ -75,6 +78,18 @@ plugins.withId("app.cash.paparazzi") {
             "See https://github.com/cashapp/paparazzi/issues/906.",
         )
       }
+    }
+  }
+}
+
+afterEvaluate {
+  android.libraryVariants.forEach { variant ->
+    publishing.publications.create(variant.name, MavenPublication::class.java) {
+      from(components.findByName(variant.name))
+
+      groupId = "io.github.shafaat73"
+      artifactId = "android-crop-kit"
+      version = "1.0.0"
     }
   }
 }

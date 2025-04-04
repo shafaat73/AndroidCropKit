@@ -1,12 +1,15 @@
 package com.canhub.cropper
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -23,23 +26,14 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.net.toUri
 import com.canhub.cropper.CropImageView.CropResult
-import com.canhub.cropper.CropImageView.OnCropImageCompleteListener
-import com.canhub.cropper.CropImageView.OnSetImageUriCompleteListener
 import com.canhub.cropper.databinding.CropImageActivityBinding
 import com.canhub.cropper.utils.getUriForFile
 import java.io.File
 
-@Deprecated(
-  message = """
-  Create your own Activity and use the CropImageView directly.
-  This way you can customize everything and have utter control of everything.
-  Feel free to use this Activity Code to create your own Activity.
-""",
-)
 open class CropImageActivity :
   AppCompatActivity(),
-  OnSetImageUriCompleteListener,
-  OnCropImageCompleteListener {
+  CropImageView.OnSetImageUriCompleteListener,
+  CropImageView.OnCropImageCompleteListener {
 
   /** Persist URI image to crop URI if specific permissions are required. */
   private var cropImageUri: Uri? = null
@@ -61,6 +55,46 @@ open class CropImageActivity :
     } else {
       onPickImageResult(null)
     }
+  }
+
+  private val requestCameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+    if (isGranted) {
+      takePicture()
+    } else {
+      showPermissionDeniedDialog()
+    }
+  }
+
+  private fun takePicture() {
+    val hasCameraPermission = ContextCompat.checkSelfPermission(
+      this,
+      Manifest.permission.CAMERA
+    ) == PackageManager.PERMISSION_GRANTED
+
+    if (hasCameraPermission) {
+      getTmpFileUri().let { uri ->
+        latestTmpUri = uri
+        latestTmpUri?.let {
+          takePicture.launch(it)
+        }
+      }
+    } else {
+      requestCameraPermission.launch(Manifest.permission.CAMERA)
+    }
+  }
+
+  private fun showPermissionDeniedDialog() {
+    AlertDialog.Builder(this)
+      .setTitle(R.string.permission_required_text)
+      .setMessage(R.string.camera_permission_text)
+      .setCancelable(false)
+      .setPositiveButton(R.string.go_to_setting) { _, _ ->
+        openAppSettings()
+      }
+      .setNegativeButton(R.string.cancel){_,_ ->
+        onPickImageResult(null)
+      }
+      .show()
   }
 
   public override fun onCreate(savedInstanceState: Bundle?) {
@@ -180,10 +214,7 @@ open class CropImageActivity :
   }
 
   private fun openCamera() {
-    getTmpFileUri().let { uri ->
-      latestTmpUri = uri
-      takePicture.launch(uri)
-    }
+    takePicture()
   }
 
   private fun getTmpFileUri(): Uri {
@@ -478,6 +509,15 @@ open class CropImageActivity :
     }
   }
 
+  private fun openAppSettings() {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null))
+    startActivity(intent)
+  }
+
+  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+  }
   enum class Source { CAMERA, GALLERY }
 
   private companion object {
