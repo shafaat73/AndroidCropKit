@@ -3,10 +3,9 @@ plugins {
   id("org.jetbrains.kotlin.android")
   id("com.android.library")
   id("org.jetbrains.kotlin.plugin.parcelize")
+  id("com.vanniktech.maven.publish")
   id("app.cash.licensee")
   id("app.cash.paparazzi")
-  id("maven-publish")
-  id("signing")
 }
 
 licensee {
@@ -82,14 +81,15 @@ plugins.withId("app.cash.paparazzi") {
   }
 }
 
+
 afterEvaluate {
   android.libraryVariants.forEach { variant ->
     publishing.publications.create(variant.name, MavenPublication::class.java) {
       from(components.findByName(variant.name))
 
-      groupId = "io.github.shafaat73"
-      artifactId = "android-crop-kit"
-      version = "1.0.0"
+      groupId = project.property("GROUP").toString()
+      artifactId = project.property("POM_ARTIFACT_ID").toString()
+      version = project.property("VERSION_NAME").toString()
     }
   }
 }

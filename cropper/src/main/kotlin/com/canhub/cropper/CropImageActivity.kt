@@ -1,6 +1,7 @@
 package com.canhub.cropper
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.PorterDuff
@@ -28,6 +29,7 @@ import androidx.core.net.toUri
 import com.canhub.cropper.CropImageView.CropResult
 import com.canhub.cropper.databinding.CropImageActivityBinding
 import com.canhub.cropper.utils.getUriForFile
+import com.canhub.cropper.utils.isPermissionDeclared
 import java.io.File
 
 open class CropImageActivity :
@@ -65,11 +67,23 @@ open class CropImageActivity :
     }
   }
 
+  private val appSettingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
+    takePicture()
+  }
+
   private fun takePicture() {
+    val isCameraPermissionDeclared = isPermissionDeclared(this, android.Manifest.permission.CAMERA)
     val hasCameraPermission = ContextCompat.checkSelfPermission(
       this,
       Manifest.permission.CAMERA
     ) == PackageManager.PERMISSION_GRANTED
+
+    if (!isCameraPermissionDeclared) {
+      val tmpUri = getTmpFileUri()
+      latestTmpUri = tmpUri
+      takePicture.launch(tmpUri)
+      return
+    }
 
     if (hasCameraPermission) {
       getTmpFileUri().let { uri ->
@@ -511,7 +525,7 @@ open class CropImageActivity :
 
   private fun openAppSettings() {
     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null))
-    startActivity(intent)
+    appSettingsLauncher.launch(intent)
   }
 
   override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

@@ -1,7 +1,9 @@
 package com.canhub.cropper.utils
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.core.content.FileProvider
@@ -94,3 +96,26 @@ internal fun getUriForFile(context: Context, file: File): Uri {
     }
   }
 }
+
+fun isPermissionDeclared(context: Context, permission: String): Boolean {
+  return try {
+    val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      context.packageManager.getPackageInfo(
+        context.packageName,
+        PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
+      )
+    } else {
+      @Suppress("DEPRECATION")
+      context.packageManager.getPackageInfo(
+        context.packageName,
+        PackageManager.GET_PERMISSIONS
+      )
+    }
+
+    val declaredPermissions = packageInfo.requestedPermissions
+    declaredPermissions?.contains(permission) == true
+  } catch (e: Exception) {
+    false
+  }
+}
+

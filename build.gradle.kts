@@ -6,6 +6,7 @@ buildscript {
     classpath(libs.plugin.kotlin)
     classpath(libs.plugin.licensee)
     classpath(libs.plugin.paparazzi)
+    classpath(libs.plugin.publish)
   }
 }
 
@@ -22,7 +23,7 @@ codeQualityTools {
   }
   ktlint {
     toolVersion = libs.versions.ktlint.get()
-    experimental = true
+//    experimental = true
   }
   detekt {
     enabled = false // Don"t want.
