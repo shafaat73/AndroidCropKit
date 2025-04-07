@@ -11,7 +11,7 @@ Android Crop Kit
 
 ```groovy
 dependencies {
-  implementation("com.vanniktech:android-image-cropper:4.6.0")
+  implementation(io.github.shafaat73:android-crop-kit:1.0.2")
 }
 ```
 
@@ -139,37 +139,6 @@ override fun showImageSourceDialog(openSource: (Source) -> Unit) {
   super.showImageSourceDialog(openCamera)
 }
 ```
-
-## Posts
-
- - [Android cropping image from camera or gallery](https://canato.medium.com/android-cropping-image-from-camera-or-gallery-fbe732800b08)
-
-## Migrating from Android Image Cropper
-
-Start by using [Version 4.3.3](https://github.com/CanHub/Android-Image-Cropper/releases/tag/4.3.3):
-
-```groovy
-dependencies {
-  implementation("com.vanniktech:android-image-cropper:4.3.3")
-}
-```
-
-### Update all imports
-
-```diff
--import com.theartofdev.edmodo.cropper.CropImage
--import com.theartofdev.edmodo.cropper.CropImageActivity
-+import com.canhub.cropper.CropImage
-+import com.canhub.cropper.CropImageActivity
-```
-
-### Update all XML references
-
-```diff
--<com.theartofdev.edmodo.cropper.CropImageView
-+<com.canhub.cropper.CropImageView
-```
-
 When using Activity Contracts, consult with the sample app on how to use our Activity Contracts since `onActivityResult` got deprecated.
 
 Versions after 4.3.3 have changed the APIs quite a bit, it's best to upgrade to each minor version individually, remove deprecated API usages and continue upgrading. So after using 4.3.3, upgrade to 4.4.0, upgrade to 4.5.0, 4.6.0, etc.
