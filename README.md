@@ -145,8 +145,8 @@ Versions after 4.3.3 have changed the APIs quite a bit, it's best to upgrade to 
 
 ## License
 
-Forked from [ArthurHub](https://github.com/ArthurHub/Android-Image-Cropper)
-Originally forked from [edmodo/cropper](https://github.com/edmodo/cropper).
+Forked from [CanHub/Android-Image-Cropper](https://github.com/CanHub/Android-Image-Cropper)
+Originally forked from [ArthurHub]([https://github.com/edmodo/cropper](https://github.com/ArthurHub/Android-Image-Cropper)).
 
 Copyright 2016, Arthur Teplitzki, 2013, Edmodo, Inc.
 
