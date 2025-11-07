@@ -50,6 +50,7 @@ dependencies {
   implementation(libs.androidx.exifinterface)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
+  implementation(libs.bundles.sdpSsp)
 }
 
 dependencies {

@@ -44,13 +44,15 @@ internal class SampleCropFragment : Fragment() {
         handleCropImageResult(result.uriContent.toString())
       }
       result is CropImage.CancelledResult -> showErrorMessage("cropping image was cancelled by the user")
+      result is CropImage.RetryResult -> startCameraWithoutUri(includeCamera = true, includeGallery = true)
       else -> showErrorMessage("cropping image failed")
     }
   }
 
   private val customCropImage = registerForActivityResult(CropImageContract()) {
-    if (it !is CropImage.CancelledResult) {
-      handleCropImageResult(it.uriContent.toString())
+    when(it){
+      is  CropImage.RetryResult -> startCameraWithoutUri(includeCamera = true, includeGallery = true)
+      !is CropImage.CancelledResult -> handleCropImageResult(it.uriContent.toString())
     }
   }
 

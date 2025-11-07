@@ -26,6 +26,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.net.toUri
+import androidx.core.view.WindowInsetsControllerCompat
+import com.canhub.cropper.CropImage.CROP_IMAGE_ACTIVITY_RESULT_RETRY_CODE
 import com.canhub.cropper.CropImageView.CropResult
 import com.canhub.cropper.databinding.CropImageActivityBinding
 import com.canhub.cropper.utils.getUriForFile
@@ -113,7 +115,8 @@ open class CropImageActivity :
 
   public override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
+    window.statusBarColor = ContextCompat.getColor(this, android.R.color.black)
+    WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
     binding = CropImageActivityBinding.inflate(layoutInflater)
     setContentView(binding.root)
     setCropImageView(binding.cropImageView)
@@ -147,6 +150,14 @@ open class CropImageActivity :
     onBackPressedDispatcher.addCallback {
       setResultCancel()
     }
+
+    binding.btnRetry.setOnClickListener {
+      setResultRetry()
+    }
+
+    binding.btnOk.setOnClickListener {
+      cropImage()
+    }
   }
 
   private fun setCustomizations() {
@@ -154,35 +165,35 @@ open class CropImageActivity :
       binding.root.setBackgroundColor(activityBackgroundColor)
     }
 
-    supportActionBar?.let {
-      title = cropImageOptions.activityTitle.ifEmpty { "" }
-      it.setDisplayHomeAsUpEnabled(true)
-      cropImageOptions.toolbarColor?.let { toolbarColor ->
-        it.setBackgroundDrawable(ColorDrawable(toolbarColor))
-      }
-      cropImageOptions.toolbarTitleColor?.let { toolbarTitleColor ->
-        val spannableTitle: Spannable = SpannableString(title)
-        spannableTitle.setSpan(
-          ForegroundColorSpan(toolbarTitleColor),
-          0,
-          spannableTitle.length,
-          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-        )
-        title = spannableTitle
-      }
-      cropImageOptions.toolbarBackButtonColor?.let { backBtnColor ->
-        try {
-          val upArrow = ContextCompat.getDrawable(
-            this,
-            R.drawable.ic_arrow_back_24,
-          )
-          upArrow?.colorFilter = PorterDuffColorFilter(backBtnColor, PorterDuff.Mode.SRC_ATOP)
-          it.setHomeAsUpIndicator(upArrow)
-        } catch (e: Exception) {
-          e.printStackTrace()
-        }
-      }
-    }
+//    supportActionBar?.let {
+//      title = cropImageOptions.activityTitle.ifEmpty { "" }
+//      it.setDisplayHomeAsUpEnabled(true)
+//      cropImageOptions.toolbarColor?.let { toolbarColor ->
+//        it.setBackgroundDrawable(ColorDrawable(toolbarColor))
+//      }
+//      cropImageOptions.toolbarTitleColor?.let { toolbarTitleColor ->
+//        val spannableTitle: Spannable = SpannableString(title)
+//        spannableTitle.setSpan(
+//          ForegroundColorSpan(toolbarTitleColor),
+//          0,
+//          spannableTitle.length,
+//          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+//        )
+//        title = spannableTitle
+//      }
+//      cropImageOptions.toolbarBackButtonColor?.let { backBtnColor ->
+//        try {
+//          val upArrow = ContextCompat.getDrawable(
+//            this,
+//            R.drawable.ic_arrow_back_24,
+//          )
+//          upArrow?.colorFilter = PorterDuffColorFilter(backBtnColor, PorterDuff.Mode.SRC_ATOP)
+//          it.setHomeAsUpIndicator(upArrow)
+//        } catch (e: Exception) {
+//          e.printStackTrace()
+//        }
+//      }
+//    }
   }
 
   private fun showIntentChooser() {
@@ -281,98 +292,98 @@ open class CropImageActivity :
     outState.putString(BUNDLE_KEY_TMP_URI, latestTmpUri.toString())
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    if (cropImageOptions.skipEditing) return true
-    menuInflater.inflate(R.menu.crop_image_menu, menu)
+//  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+//    if (cropImageOptions.skipEditing) return true
+//    menuInflater.inflate(R.menu.crop_image_menu, menu)
+//
+//    if (!cropImageOptions.allowRotation) {
+//      menu.removeItem(R.id.ic_rotate_left_24)
+//      menu.removeItem(R.id.ic_rotate_right_24)
+//    } else if (cropImageOptions.allowCounterRotation) {
+//      menu.findItem(R.id.ic_rotate_left_24).isVisible = true
+//    }
+//
+//    if (!cropImageOptions.allowFlipping) menu.removeItem(R.id.ic_flip_24)
+//
+//    if (cropImageOptions.cropMenuCropButtonTitle != null) {
+//      menu.findItem(R.id.crop_image_menu_crop).title =
+//        cropImageOptions.cropMenuCropButtonTitle
+//    }
+//
+//    var cropIcon: Drawable? = null
+//    try {
+//      if (cropImageOptions.cropMenuCropButtonIcon != 0) {
+//        cropIcon = ContextCompat.getDrawable(this, cropImageOptions.cropMenuCropButtonIcon)
+//        menu.findItem(R.id.crop_image_menu_crop).icon = cropIcon
+//      }
+//    } catch (e: Exception) {
+//      Log.w("AIC", "Failed to read menu crop drawable", e)
+//    }
+//
+//    if (cropImageOptions.activityMenuIconColor != 0) {
+//      updateMenuItemIconColor(
+//        menu,
+//        R.id.ic_rotate_left_24,
+//        cropImageOptions.activityMenuIconColor,
+//      )
+//      updateMenuItemIconColor(
+//        menu,
+//        R.id.ic_rotate_right_24,
+//        cropImageOptions.activityMenuIconColor,
+//      )
+//      updateMenuItemIconColor(menu, R.id.ic_flip_24, cropImageOptions.activityMenuIconColor)
+//
+//      if (cropIcon != null) {
+//        updateMenuItemIconColor(
+//          menu,
+//          R.id.crop_image_menu_crop,
+//          cropImageOptions.activityMenuIconColor,
+//        )
+//      }
+//    }
+//    cropImageOptions.activityMenuTextColor?.let { menuItemsTextColor ->
+//      val menuItemIds = listOf(
+//        R.id.ic_rotate_left_24,
+//        R.id.ic_rotate_right_24,
+//        R.id.ic_flip_24,
+//        R.id.ic_flip_24_horizontally,
+//        R.id.ic_flip_24_vertically,
+//        R.id.crop_image_menu_crop,
+//      )
+//      for (itemId in menuItemIds) {
+//        updateMenuItemTextColor(menu, itemId, menuItemsTextColor)
+//      }
+//    }
+//    return true
+//  }
 
-    if (!cropImageOptions.allowRotation) {
-      menu.removeItem(R.id.ic_rotate_left_24)
-      menu.removeItem(R.id.ic_rotate_right_24)
-    } else if (cropImageOptions.allowCounterRotation) {
-      menu.findItem(R.id.ic_rotate_left_24).isVisible = true
-    }
-
-    if (!cropImageOptions.allowFlipping) menu.removeItem(R.id.ic_flip_24)
-
-    if (cropImageOptions.cropMenuCropButtonTitle != null) {
-      menu.findItem(R.id.crop_image_menu_crop).title =
-        cropImageOptions.cropMenuCropButtonTitle
-    }
-
-    var cropIcon: Drawable? = null
-    try {
-      if (cropImageOptions.cropMenuCropButtonIcon != 0) {
-        cropIcon = ContextCompat.getDrawable(this, cropImageOptions.cropMenuCropButtonIcon)
-        menu.findItem(R.id.crop_image_menu_crop).icon = cropIcon
-      }
-    } catch (e: Exception) {
-      Log.w("AIC", "Failed to read menu crop drawable", e)
-    }
-
-    if (cropImageOptions.activityMenuIconColor != 0) {
-      updateMenuItemIconColor(
-        menu,
-        R.id.ic_rotate_left_24,
-        cropImageOptions.activityMenuIconColor,
-      )
-      updateMenuItemIconColor(
-        menu,
-        R.id.ic_rotate_right_24,
-        cropImageOptions.activityMenuIconColor,
-      )
-      updateMenuItemIconColor(menu, R.id.ic_flip_24, cropImageOptions.activityMenuIconColor)
-
-      if (cropIcon != null) {
-        updateMenuItemIconColor(
-          menu,
-          R.id.crop_image_menu_crop,
-          cropImageOptions.activityMenuIconColor,
-        )
-      }
-    }
-    cropImageOptions.activityMenuTextColor?.let { menuItemsTextColor ->
-      val menuItemIds = listOf(
-        R.id.ic_rotate_left_24,
-        R.id.ic_rotate_right_24,
-        R.id.ic_flip_24,
-        R.id.ic_flip_24_horizontally,
-        R.id.ic_flip_24_vertically,
-        R.id.crop_image_menu_crop,
-      )
-      for (itemId in menuItemIds) {
-        updateMenuItemTextColor(menu, itemId, menuItemsTextColor)
-      }
-    }
-    return true
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-    R.id.crop_image_menu_crop -> {
-      cropImage()
-      true
-    }
-    R.id.ic_rotate_left_24 -> {
-      rotateImage(-cropImageOptions.rotationDegrees)
-      true
-    }
-    R.id.ic_rotate_right_24 -> {
-      rotateImage(cropImageOptions.rotationDegrees)
-      true
-    }
-    R.id.ic_flip_24_horizontally -> {
-      cropImageView?.flipImageHorizontally()
-      true
-    }
-    R.id.ic_flip_24_vertically -> {
-      cropImageView?.flipImageVertically()
-      true
-    }
-    android.R.id.home -> {
-      setResultCancel()
-      true
-    }
-    else -> super.onOptionsItemSelected(item)
-  }
+//  override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+//    R.id.crop_image_menu_crop -> {
+//      cropImage()
+//      true
+//    }
+//    R.id.ic_rotate_left_24 -> {
+//      rotateImage(-cropImageOptions.rotationDegrees)
+//      true
+//    }
+//    R.id.ic_rotate_right_24 -> {
+//      rotateImage(cropImageOptions.rotationDegrees)
+//      true
+//    }
+//    R.id.ic_flip_24_horizontally -> {
+//      cropImageView?.flipImageHorizontally()
+//      true
+//    }
+//    R.id.ic_flip_24_vertically -> {
+//      cropImageView?.flipImageVertically()
+//      true
+//    }
+//    android.R.id.home -> {
+//      setResultCancel()
+//      true
+//    }
+//    else -> super.onOptionsItemSelected(item)
+//  }
 
   protected open fun onPickImageResult(resultUri: Uri?) {
     when (resultUri) {
@@ -454,6 +465,11 @@ open class CropImageActivity :
    */
   open fun setResultCancel() {
     setResult(RESULT_CANCELED)
+    finish()
+  }
+
+  open fun setResultRetry() {
+    setResult(CROP_IMAGE_ACTIVITY_RESULT_RETRY_CODE)
     finish()
   }
 

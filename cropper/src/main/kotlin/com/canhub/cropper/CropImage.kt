@@ -48,6 +48,7 @@ object CropImage {
    * The result code used to return error from [CropImageActivity].
    */
   const val CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE = 204
+  const val CROP_IMAGE_ACTIVITY_RESULT_RETRY_CODE = 205
 
   /**
    * Create a new bitmap that has all pixels beyond the oval shape transparent. Old bitmap is
@@ -144,6 +145,19 @@ object CropImage {
     bitmap = null,
     uriContent = null,
     error = CropException.Cancellation(),
+    cropPoints = floatArrayOf(),
+    cropRect = null,
+    wholeImageRect = null,
+    rotation = 0,
+    sampleSize = 0,
+  )
+
+  object RetryResult : CropResult(
+    originalBitmap = null,
+    originalUri = null,
+    bitmap = null,
+    uriContent = null,
+    error = CropException.Retry(),
     cropPoints = floatArrayOf(),
     cropRect = null,
     wholeImageRect = null,

@@ -3,10 +3,11 @@ minSdk = "21"
 compileSdk = "33"
 targetSdk = "33"
 
-androidgradleplugin = "8.0.2"
+androidgradleplugin = "8.11.1"
 kotlin = "1.8.22"
 kotlinxcoroutines = "1.7.2"
 ktlint = "0.50.0"
+sdp_version = "1.1.1"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version = "1.7.2" }
@@ -30,7 +31,13 @@ plugin-paparazzi = { module = "app.cash.paparazzi:paparazzi-gradle-plugin", vers
 plugin-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version = "0.29.0" }
 robolectric = { module = "org.robolectric:robolectric", version = "4.9" }
 timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
+#SDP-SSP
+sdp = { module = "com.intuit.sdp:sdp-android", version.ref = "sdp_version" }
+ssp = { module = "com.intuit.ssp:ssp-android", version.ref = "sdp_version" }
 
 [plugins]
 codequalitytools = { id = "com.vanniktech.code.quality.tools", version = "0.24.0" }
 dependencygraphgenerator = { id = "com.vanniktech.dependency.graph.generator", version = "0.8.0" }
+
+[bundles]
+sdpSsp = ["sdp", "ssp"]

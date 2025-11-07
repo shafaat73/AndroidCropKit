@@ -9,6 +9,12 @@ sealed class CropException(message: String) : Exception(message) {
     }
   }
 
+  class Retry : CropException("$EXCEPTION_PREFIX cropping has been retried by the user") {
+    internal companion object {
+      private const val serialVersionUID: Long = -6896269134508601997L
+    }
+  }
+
   class FailedToLoadBitmap(uri: Uri, message: String?) : CropException("$EXCEPTION_PREFIX Failed to load sampled bitmap: $uri\r\n$message") {
     internal companion object {
       private const val serialVersionUID: Long = 7791142932960927332L

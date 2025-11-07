@@ -34,7 +34,7 @@ import kotlinx.parcelize.Parcelize
   @JvmField var showCropOverlay: Boolean = true,
   @JvmField var showCropLabel: Boolean = false,
   @JvmField var showProgressBar: Boolean = true,
-  @JvmField @ColorInt var progressBarColor: Int = Color.rgb(153, 51, 153),
+  @JvmField @ColorInt var progressBarColor: Int = Color.BLACK,
   @JvmField var autoZoomEnabled: Boolean = true,
   /** Multitouch allows to resize and drag the cropping window at the same time. */
   @JvmField var multiTouchEnabled: Boolean = false,
@@ -98,7 +98,7 @@ import kotlinx.parcelize.Parcelize
   @JvmField @Px var cropperLabelTextSize: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20f, Resources.getSystem().displayMetrics),
   @JvmField @ColorInt var cropperLabelTextColor: Int = Color.WHITE,
   @JvmField var cropperLabelText: String? = "",
-  @JvmField @ColorInt var activityBackgroundColor: Int = Color.WHITE,
+  @JvmField @ColorInt var activityBackgroundColor: Int = Color.BLACK,
   @JvmField @ColorInt var toolbarColor: Int? = null,
   @JvmField @ColorInt var toolbarTitleColor: Int? = null,
   @JvmField @ColorInt var toolbarBackButtonColor: Int? = null,
