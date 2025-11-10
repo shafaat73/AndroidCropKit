@@ -13,4 +13,7 @@
     <string name="camera_permission_text">Camera permission is required for this feature. Please enable it in settings.</string>
     <string name="go_to_setting">Open Settings</string>
     <string name="cancel">Cancel</string>
+    <string name="photo_is_small">Photo is too Small</string>
+    <string name="this_photo_didn_t_meet_requirement">This photo didn\'t meet the minimum size requirement. Please try again.</string>
+    <string name="got_it">Got it</string>
 </resources>

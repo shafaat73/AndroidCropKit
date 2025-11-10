@@ -10,6 +10,7 @@
         android:layout_height="match_parent" />
 
     <LinearLayout
+        android:id="@+id/llActionButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -23,17 +24,17 @@
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
             android:layout_marginEnd="@dimen/_14sdp"
-            android:background="@drawable/bg_button"
+            android:background="@drawable/bg_button_cropper"
             android:backgroundTint="#FAE6EF"
             android:elevation="@dimen/_16sdp"
-            android:src="@drawable/ic_retry" />
+            android:src="@drawable/ic_retry_cropper" />
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/btnOk"
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
-            android:background="@drawable/bg_button"
+            android:background="@drawable/bg_button_cropper"
             android:elevation="@dimen/_16sdp"
-            android:src="@drawable/ic_tick" />
+            android:src="@drawable/ic_tick_cropper" />
     </LinearLayout>
 </RelativeLayout>

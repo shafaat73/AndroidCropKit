@@ -1,23 +1,15 @@
 package com.canhub.cropper
 
 import android.Manifest
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.util.Log
-import android.view.KeyEvent
 import android.view.Menu
-import android.view.MenuItem
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -27,9 +19,11 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.isVisible
 import com.canhub.cropper.CropImage.CROP_IMAGE_ACTIVITY_RESULT_RETRY_CODE
 import com.canhub.cropper.CropImageView.CropResult
 import com.canhub.cropper.databinding.CropImageActivityBinding
+import com.canhub.cropper.utils.DialogUtils
 import com.canhub.cropper.utils.getUriForFile
 import com.canhub.cropper.utils.isPermissionDeclared
 import java.io.File
@@ -50,7 +44,10 @@ open class CropImageActivity :
   private lateinit var binding: CropImageActivityBinding
   private var latestTmpUri: Uri? = null
   private val pickImageGallery = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-    onPickImageResult(uri)
+    if (isLowResolutionImage(this, uri))
+      showImageQualityLowDialog()
+    else
+      onPickImageResult(uri)
   }
 
   private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) {
@@ -76,8 +73,8 @@ open class CropImageActivity :
   private fun takePicture() {
     val isCameraPermissionDeclared = isPermissionDeclared(this, android.Manifest.permission.CAMERA)
     val hasCameraPermission = ContextCompat.checkSelfPermission(
-      this,
-      Manifest.permission.CAMERA
+        this,
+        Manifest.permission.CAMERA,
     ) == PackageManager.PERMISSION_GRANTED
 
     if (!isCameraPermissionDeclared) {
@@ -107,10 +104,15 @@ open class CropImageActivity :
       .setPositiveButton(R.string.go_to_setting) { _, _ ->
         openAppSettings()
       }
-      .setNegativeButton(R.string.cancel){_,_ ->
+      .setNegativeButton(R.string.cancel) { _, _ ->
         onPickImageResult(null)
       }
       .show()
+  }
+
+  private fun showImageQualityLowDialog() {
+    setActionButtonsVisibility(false)
+    DialogUtils.showImageQualityLowDialog(this, ::setResultCancel)
   }
 
   public override fun onCreate(savedInstanceState: Bundle?) {
@@ -128,15 +130,18 @@ open class CropImageActivity :
     if (savedInstanceState == null) {
       if (cropImageUri == null || cropImageUri == Uri.EMPTY) {
         when {
-          cropImageOptions.showIntentChooser -> showIntentChooser()
+          cropImageOptions.showIntentChooser          -> showIntentChooser()
           cropImageOptions.imageSourceIncludeGallery &&
             cropImageOptions.imageSourceIncludeCamera ->
             showImageSourceDialog(::openSource)
-          cropImageOptions.imageSourceIncludeGallery ->
+
+          cropImageOptions.imageSourceIncludeGallery  ->
             pickImageGallery.launch("image/*")
-          cropImageOptions.imageSourceIncludeCamera ->
+
+          cropImageOptions.imageSourceIncludeCamera   ->
             openCamera()
-          else -> finish()
+
+          else                                        -> finish()
         }
       } else {
         cropImageView?.setImageUriAsync(cropImageUri)
@@ -164,36 +169,6 @@ open class CropImageActivity :
     cropImageOptions.activityBackgroundColor.let { activityBackgroundColor ->
       binding.root.setBackgroundColor(activityBackgroundColor)
     }
-
-//    supportActionBar?.let {
-//      title = cropImageOptions.activityTitle.ifEmpty { "" }
-//      it.setDisplayHomeAsUpEnabled(true)
-//      cropImageOptions.toolbarColor?.let { toolbarColor ->
-//        it.setBackgroundDrawable(ColorDrawable(toolbarColor))
-//      }
-//      cropImageOptions.toolbarTitleColor?.let { toolbarTitleColor ->
-//        val spannableTitle: Spannable = SpannableString(title)
-//        spannableTitle.setSpan(
-//          ForegroundColorSpan(toolbarTitleColor),
-//          0,
-//          spannableTitle.length,
-//          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-//        )
-//        title = spannableTitle
-//      }
-//      cropImageOptions.toolbarBackButtonColor?.let { backBtnColor ->
-//        try {
-//          val upArrow = ContextCompat.getDrawable(
-//            this,
-//            R.drawable.ic_arrow_back_24,
-//          )
-//          upArrow?.colorFilter = PorterDuffColorFilter(backBtnColor, PorterDuff.Mode.SRC_ATOP)
-//          it.setHomeAsUpIndicator(upArrow)
-//        } catch (e: Exception) {
-//          e.printStackTrace()
-//        }
-//      }
-//    }
   }
 
   private fun showIntentChooser() {
@@ -233,7 +208,7 @@ open class CropImageActivity :
 
   private fun openSource(source: Source) {
     when (source) {
-      Source.CAMERA -> openCamera()
+      Source.CAMERA  -> openCamera()
       Source.GALLERY -> pickImageGallery.launch("image/*")
     }
   }
@@ -256,23 +231,20 @@ open class CropImageActivity :
    * and customised with the app layout if you need.
    */
   open fun showImageSourceDialog(openSource: (Source) -> Unit) {
-    AlertDialog.Builder(this)
-      .setCancelable(false)
-      .setOnKeyListener { _, keyCode, keyEvent ->
-        if (keyCode == KeyEvent.KEYCODE_BACK && keyEvent.action == KeyEvent.ACTION_UP) {
-          setResultCancel()
-          finish()
-        }
-        true
-      }
-      .setTitle(R.string.pick_image_chooser_title)
-      .setItems(
-        arrayOf(
-          getString(R.string.pick_image_camera),
-          getString(R.string.pick_image_gallery),
-        ),
-      ) { _, position -> openSource(if (position == 0) Source.CAMERA else Source.GALLERY) }
-      .show()
+    setActionButtonsVisibility(false)
+    DialogUtils.showImageSourceDialog(
+        this,
+        onCameraSelected = {
+            openSource(Source.CAMERA)
+        },
+        onGallerySelected = {
+            openSource(Source.GALLERY)
+        },
+    )
+  }
+
+  private fun setActionButtonsVisibility(visible: Boolean) {
+    binding.llActionButtons.isVisible = visible
   }
 
   public override fun onStart() {
@@ -292,99 +264,6 @@ open class CropImageActivity :
     outState.putString(BUNDLE_KEY_TMP_URI, latestTmpUri.toString())
   }
 
-//  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//    if (cropImageOptions.skipEditing) return true
-//    menuInflater.inflate(R.menu.crop_image_menu, menu)
-//
-//    if (!cropImageOptions.allowRotation) {
-//      menu.removeItem(R.id.ic_rotate_left_24)
-//      menu.removeItem(R.id.ic_rotate_right_24)
-//    } else if (cropImageOptions.allowCounterRotation) {
-//      menu.findItem(R.id.ic_rotate_left_24).isVisible = true
-//    }
-//
-//    if (!cropImageOptions.allowFlipping) menu.removeItem(R.id.ic_flip_24)
-//
-//    if (cropImageOptions.cropMenuCropButtonTitle != null) {
-//      menu.findItem(R.id.crop_image_menu_crop).title =
-//        cropImageOptions.cropMenuCropButtonTitle
-//    }
-//
-//    var cropIcon: Drawable? = null
-//    try {
-//      if (cropImageOptions.cropMenuCropButtonIcon != 0) {
-//        cropIcon = ContextCompat.getDrawable(this, cropImageOptions.cropMenuCropButtonIcon)
-//        menu.findItem(R.id.crop_image_menu_crop).icon = cropIcon
-//      }
-//    } catch (e: Exception) {
-//      Log.w("AIC", "Failed to read menu crop drawable", e)
-//    }
-//
-//    if (cropImageOptions.activityMenuIconColor != 0) {
-//      updateMenuItemIconColor(
-//        menu,
-//        R.id.ic_rotate_left_24,
-//        cropImageOptions.activityMenuIconColor,
-//      )
-//      updateMenuItemIconColor(
-//        menu,
-//        R.id.ic_rotate_right_24,
-//        cropImageOptions.activityMenuIconColor,
-//      )
-//      updateMenuItemIconColor(menu, R.id.ic_flip_24, cropImageOptions.activityMenuIconColor)
-//
-//      if (cropIcon != null) {
-//        updateMenuItemIconColor(
-//          menu,
-//          R.id.crop_image_menu_crop,
-//          cropImageOptions.activityMenuIconColor,
-//        )
-//      }
-//    }
-//    cropImageOptions.activityMenuTextColor?.let { menuItemsTextColor ->
-//      val menuItemIds = listOf(
-//        R.id.ic_rotate_left_24,
-//        R.id.ic_rotate_right_24,
-//        R.id.ic_flip_24,
-//        R.id.ic_flip_24_horizontally,
-//        R.id.ic_flip_24_vertically,
-//        R.id.crop_image_menu_crop,
-//      )
-//      for (itemId in menuItemIds) {
-//        updateMenuItemTextColor(menu, itemId, menuItemsTextColor)
-//      }
-//    }
-//    return true
-//  }
-
-//  override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-//    R.id.crop_image_menu_crop -> {
-//      cropImage()
-//      true
-//    }
-//    R.id.ic_rotate_left_24 -> {
-//      rotateImage(-cropImageOptions.rotationDegrees)
-//      true
-//    }
-//    R.id.ic_rotate_right_24 -> {
-//      rotateImage(cropImageOptions.rotationDegrees)
-//      true
-//    }
-//    R.id.ic_flip_24_horizontally -> {
-//      cropImageView?.flipImageHorizontally()
-//      true
-//    }
-//    R.id.ic_flip_24_vertically -> {
-//      cropImageView?.flipImageVertically()
-//      true
-//    }
-//    android.R.id.home -> {
-//      setResultCancel()
-//      true
-//    }
-//    else -> super.onOptionsItemSelected(item)
-//  }
-
   protected open fun onPickImageResult(resultUri: Uri?) {
     when (resultUri) {
       null -> setResultCancel()
@@ -393,6 +272,7 @@ open class CropImageActivity :
         cropImageView?.setImageUriAsync(cropImageUri)
       }
     }
+    setActionButtonsVisibility(true)
   }
 
   override fun onSetImageUriComplete(view: CropImageView, uri: Uri, error: Exception?) {
@@ -517,37 +397,30 @@ open class CropImageActivity :
     }
   }
 
-  /**
-   * Update the color of a specific menu item to the given color.
-   */
-  open fun updateMenuItemTextColor(menu: Menu, itemId: Int, color: Int) {
-    val menuItem = menu.findItem(itemId) ?: return
-    val menuTitle = menuItem.title
-    if (menuTitle?.isNotBlank() == true) {
-      try {
-        val spannableTitle: Spannable = SpannableString(menuTitle)
-        spannableTitle.setSpan(
-          ForegroundColorSpan(color),
-          0,
-          spannableTitle.length,
-          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-        )
-        menuItem.title = spannableTitle
-      } catch (e: Exception) {
-        Log.w("AIC", "Failed to update menu item color", e)
-      }
-    }
-  }
-
   private fun openAppSettings() {
     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null))
     appSettingsLauncher.launch(intent)
+  }
+
+  fun isLowResolutionImage(context: Context, imageUri: Uri?): Boolean {
+    if (imageUri == null) return false
+    val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+
+    context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
+      BitmapFactory.decodeStream(inputStream, null, options)
+    }
+
+    val width = options.outWidth
+    val height = options.outHeight
+
+    return width < cropImageOptions.minCropWindowWidth && height < cropImageOptions.minCropWindowHeight
   }
 
   override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
   }
+
   enum class Source { CAMERA, GALLERY }
 
   private companion object {

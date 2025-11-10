@@ -95,6 +95,8 @@ internal class SampleCropFragment : Fragment() {
         cropImageOptions = CropImageOptions(
           imageSourceIncludeCamera = includeCamera,
           imageSourceIncludeGallery = includeGallery,
+          minCropWindowHeight = 800,
+          minCropWindowWidth = 800,
         ),
       ),
     )
