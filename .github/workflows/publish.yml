@@ -23,16 +23,18 @@ jobs:
 
       - name: Prepare Signing Key
         run: |
-          # If the secret is Base64 encoded, decode it; otherwise, write it as is.
+          # Detect if the key is Base64 encoded or raw ASCII armor
           if [[ "${{ secrets.SIGNING_PRIVATE_KEY }}" == -----BEGIN* ]]; then
             echo "${{ secrets.SIGNING_PRIVATE_KEY }}" > gpg_key.asc
           else
             echo "${{ secrets.SIGNING_PRIVATE_KEY }}" | base64 -d > gpg_key.asc
           fi
           
-          # Convert ASCII armor to binary keyring format for Gradle
+          # Import the key
           gpg --batch --import gpg_key.asc
-          gpg --batch --export-secret-keys F154B26F > secring.gpg
+          
+          # Export to binary format for Gradle, providing passphrase to avoid "Inappropriate ioctl"
+          gpg --batch --pinentry-mode loopback --passphrase "${{ secrets.SIGNING_PASSWORD }}" --export-secret-keys F154B26F > secring.gpg
 
       - name: Publish to Maven Central
         run: |
