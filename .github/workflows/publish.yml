@@ -22,13 +22,15 @@ jobs:
         run: ./gradlew :cropper:assembleRelease
 
       - name: Publish to Maven Central
-        run: ./gradlew publishAllPublicationsToMavenCentralRepository
+        run: |
+          ./gradlew publishAllPublicationsToMavenCentralRepository \
+            -PmavenCentralUsername="${{ secrets.SONATYPE_NEXUS_USERNAME }}" \
+            -PmavenCentralPassword="${{ secrets.SONATYPE_NEXUS_PASSWORD }}" \
+            -PsigningInMemoryKey="${{ secrets.SIGNING_PRIVATE_KEY }}" \
+            -PsigningInMemoryPassword="${{ secrets.SIGNING_PASSWORD }}" \
+            -PsigningInMemoryKeyId="F154B26F"
         env:
-          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingInMemoryPassword: ${{ secrets.SIGNING_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyId: "F154B26F"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
