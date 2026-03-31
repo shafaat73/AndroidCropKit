@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
   id("org.jetbrains.dokka")
   id("org.jetbrains.kotlin.android")
@@ -80,4 +82,9 @@ plugins.withId("app.cash.paparazzi") {
       }
     }
   }
+}
+
+mavenPublishing {
+  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+  signAllPublications()
 }
