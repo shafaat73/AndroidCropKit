@@ -21,14 +21,27 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew :cropper:assembleRelease
 
+      - name: Prepare Signing Key
+        run: |
+          # If the secret is Base64 encoded, decode it; otherwise, write it as is.
+          if [[ "${{ secrets.SIGNING_PRIVATE_KEY }}" == -----BEGIN* ]]; then
+            echo "${{ secrets.SIGNING_PRIVATE_KEY }}" > gpg_key.asc
+          else
+            echo "${{ secrets.SIGNING_PRIVATE_KEY }}" | base64 -d > gpg_key.asc
+          fi
+          
+          # Convert ASCII armor to binary keyring format for Gradle
+          gpg --batch --import gpg_key.asc
+          gpg --batch --export-secret-keys F154B26F > secring.gpg
+
       - name: Publish to Maven Central
         run: |
           ./gradlew publishAllPublicationsToMavenCentralRepository \
             -PmavenCentralUsername="${{ secrets.SONATYPE_NEXUS_USERNAME }}" \
             -PmavenCentralPassword="${{ secrets.SONATYPE_NEXUS_PASSWORD }}" \
-            -PsigningInMemoryKey="${{ secrets.SIGNING_PRIVATE_KEY }}" \
-            -PsigningInMemoryPassword="${{ secrets.SIGNING_PASSWORD }}" \
-            -PsigningInMemoryKeyId="F154B26F"
+            -Psigning.keyId="F154B26F" \
+            -Psigning.password="${{ secrets.SIGNING_PASSWORD }}" \
+            -Psigning.secretKeyRingFile="$(pwd)/secring.gpg"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
