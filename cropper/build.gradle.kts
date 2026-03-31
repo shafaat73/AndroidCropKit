@@ -82,15 +82,9 @@ plugins.withId("app.cash.paparazzi") {
   }
 }
 
+import com.vanniktech.maven.publish.SonatypeHost
 
-afterEvaluate {
-  android.libraryVariants.forEach { variant ->
-    publishing.publications.create(variant.name, MavenPublication::class.java) {
-      from(components.findByName(variant.name))
-
-      groupId = project.property("GROUP").toString()
-      artifactId = project.property("POM_ARTIFACT_ID").toString()
-      version = project.property("VERSION_NAME").toString()
-    }
-  }
+mavenPublishing {
+  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+  signAllPublications()
 }
