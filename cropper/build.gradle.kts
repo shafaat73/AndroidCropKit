@@ -81,10 +81,3 @@ plugins.withId("app.cash.paparazzi") {
     }
   }
 }
-
-import com.vanniktech.maven.publish.SonatypeHost
-
-mavenPublishing {
-  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-  signAllPublications()
-}
