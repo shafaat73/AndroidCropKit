@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -27,6 +30,7 @@ import com.canhub.cropper.utils.DialogUtils
 import com.canhub.cropper.utils.getUriForFile
 import com.canhub.cropper.utils.isPermissionDeclared
 import java.io.File
+import androidx.core.graphics.toColorInt
 
 open class CropImageActivity :
   AppCompatActivity(),
@@ -43,6 +47,7 @@ open class CropImageActivity :
   private var cropImageView: CropImageView? = null
   private lateinit var binding: CropImageActivityBinding
   private var latestTmpUri: Uri? = null
+  private var isViewOnceActive: Boolean = false
   private val pickImageGallery = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
     if (isLowResolutionImage(this, uri))
       showImageQualityLowDialog()
@@ -156,8 +161,13 @@ open class CropImageActivity :
       setResultCancel()
     }
 
-    binding.btnRetry.setOnClickListener {
-      setResultRetry()
+    binding.btnBack.setOnClickListener {
+      setResultCancel()
+    }
+
+    binding.btnViewOnce.setOnClickListener {
+      isViewOnceActive = !isViewOnceActive
+      updateViewOnceButtonState()
     }
 
     binding.btnOk.setOnClickListener {
@@ -168,6 +178,18 @@ open class CropImageActivity :
   private fun setCustomizations() {
     cropImageOptions.activityBackgroundColor.let { activityBackgroundColor ->
       binding.root.setBackgroundColor(activityBackgroundColor)
+    }
+  }
+
+  private fun updateViewOnceButtonState() {
+    if (isViewOnceActive) {
+      binding.btnViewOnce.setBackgroundResource(R.drawable.bg_button_retry_cropper_active)
+      binding.btnViewOnce.drawable?.colorFilter =
+        PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
+    } else {
+      binding.btnViewOnce.setBackgroundResource(R.drawable.bg_button_retry_cropper)
+      binding.btnViewOnce.drawable?.colorFilter =
+        PorterDuffColorFilter("#C81262".toColorInt(), PorterDuff.Mode.SRC_IN)
     }
   }
 

@@ -9,32 +9,68 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="@dimen/_14sdp"
+        android:layout_marginTop="@dimen/_14sdp"
+        android:background="@drawable/bg_button_back_cropper"
+        android:elevation="@dimen/_16sdp"
+        android:padding="@dimen/_8sdp"
+        android:scaleType="centerInside"
+        android:tint="@android:color/white"
+        android:src="@drawable/ic_arrow_back_24" />
+
     <LinearLayout
         android:id="@+id/llActionButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_marginStart="@dimen/_14sdp"
+        android:layout_marginEnd="@dimen/_14sdp"
         android:layout_marginBottom="@dimen/_42sdp"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/btnRetry"
+            android:id="@+id/btnViewOnce"
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
-            android:layout_marginEnd="@dimen/_14sdp"
-            android:background="@drawable/bg_button_cropper"
-            android:backgroundTint="#FAE6EF"
+            android:background="@drawable/bg_button_retry_cropper"
             android:elevation="@dimen/_16sdp"
-            android:src="@drawable/ic_retry_cropper" />
+            android:padding="@dimen/_13sdp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_view_once_cropper" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <LinearLayout
             android:id="@+id/btnOk"
-            android:layout_width="@dimen/_50sdp"
+            android:layout_width="0dp"
             android:layout_height="@dimen/_50sdp"
-            android:background="@drawable/bg_button_cropper"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_send_cropper"
             android:elevation="@dimen/_16sdp"
-            android:src="@drawable/ic_tick_cropper" />
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:contentDescription="@string/crop_image_menu_crop"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:src="@drawable/ic_send_cropper" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/send_image_to_chat"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:textSize="@dimen/_12ssp" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

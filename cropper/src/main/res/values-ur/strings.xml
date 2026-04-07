@@ -9,4 +9,5 @@
   <string name="pick_image_chooser_title">ذریعہ منتخب کریں</string>
   <string name="pick_image_camera">کیمرہ</string>
   <string name="pick_image_gallery">گالری</string>
+  <string name="send_image_to_chat">چیٹ میں تصویر بھیجیں</string>
 </resources>

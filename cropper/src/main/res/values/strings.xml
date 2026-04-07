@@ -16,4 +16,5 @@
     <string name="photo_is_small">Photo is too Small</string>
     <string name="this_photo_didn_t_meet_requirement">This photo didn\'t meet the minimum size requirement. Please try again.</string>
     <string name="got_it">Got it</string>
+    <string name="send_image_to_chat">Send Image to Chat</string>
 </resources>
