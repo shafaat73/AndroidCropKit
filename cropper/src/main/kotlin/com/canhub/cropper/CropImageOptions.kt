@@ -103,6 +103,8 @@ import kotlinx.parcelize.Parcelize
   @JvmField @ColorInt var toolbarTitleColor: Int? = null,
   @JvmField @ColorInt var toolbarBackButtonColor: Int? = null,
   @JvmField @ColorInt var toolbarTintColor: Int? = null,
+  /** If true, shows chat-style buttons (ViewOnce + Send). If false, shows Retry + Done buttons. */
+  @JvmField var openFromChat: Boolean = false,
 ) : Parcelable {
   init {
     require(maxZoom >= 0) { "Cannot set max zoom to a number < 1" }

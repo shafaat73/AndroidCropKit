@@ -36,6 +36,27 @@
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btnRetry"
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_50sdp"
+            android:layout_marginEnd="@dimen/_14sdp"
+            android:background="@drawable/bg_button_cropper"
+            android:backgroundTint="#FAE6EF"
+            android:visibility="gone"
+            android:elevation="@dimen/_16sdp"
+            android:src="@drawable/ic_retry_cropper" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btnDone"
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_50sdp"
+            android:visibility="gone"
+            android:background="@drawable/bg_button_cropper"
+            android:elevation="@dimen/_16sdp"
+            android:src="@drawable/ic_tick_cropper" />
+
+
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/btnViewOnce"
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
@@ -55,7 +76,6 @@
             android:elevation="@dimen/_16sdp"
             android:gravity="center"
             android:orientation="horizontal">
-
             <ImageView
                 android:contentDescription="@string/crop_image_menu_crop"
                 android:layout_width="@dimen/_20sdp"

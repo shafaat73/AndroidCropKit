@@ -156,6 +156,7 @@ open class CropImageActivity :
     }
 
     setCustomizations()
+    setupButtonVisibility()
 
     onBackPressedDispatcher.addCallback {
       setResultCancel()
@@ -173,11 +174,33 @@ open class CropImageActivity :
     binding.btnOk.setOnClickListener {
       cropImage()
     }
+
+    binding.btnRetry.setOnClickListener {
+      setResultRetry()
+    }
+
+    binding.btnDone.setOnClickListener {
+      cropImage()
+    }
   }
 
   private fun setCustomizations() {
     cropImageOptions.activityBackgroundColor.let { activityBackgroundColor ->
       binding.root.setBackgroundColor(activityBackgroundColor)
+    }
+  }
+
+  private fun setupButtonVisibility() {
+    if (cropImageOptions.openFromChat) {
+      binding.btnViewOnce.isVisible = true
+      binding.btnOk.isVisible = true
+      binding.btnRetry.isVisible = false
+      binding.btnDone.isVisible = false
+    } else {
+      binding.btnViewOnce.isVisible = false
+      binding.btnOk.isVisible = false
+      binding.btnRetry.isVisible = true
+      binding.btnDone.isVisible = true
     }
   }
 
