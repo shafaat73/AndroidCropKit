@@ -16,7 +16,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="@dimen/_14sdp"
-        android:layout_marginTop="@dimen/_14sdp"
+        android:layout_marginTop="@dimen/_30sdp"
         android:background="@drawable/bg_button_back_cropper"
         android:elevation="@dimen/_16sdp"
         android:padding="@dimen/_8sdp"
