@@ -86,6 +86,7 @@ object CropImage {
       rotation: Int,
       wholeImageRect: Rect?,
       sampleSize: Int,
+      isViewOnce: Boolean = false,
     ) : super(
       originalBitmap = null,
       originalUri = originalUri,
@@ -97,6 +98,7 @@ object CropImage {
       wholeImageRect = wholeImageRect,
       rotation = rotation,
       sampleSize = sampleSize,
+      isViewOnce = isViewOnce,
     )
 
     @Suppress("DEPRECATION")
@@ -111,6 +113,7 @@ object CropImage {
       wholeImageRect = `in`.readParcelable<Parcelable>(Rect::class.java.classLoader) as Rect?,
       rotation = `in`.readInt(),
       sampleSize = `in`.readInt(),
+      isViewOnce = `in`.readInt() != 0,
     )
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
@@ -122,6 +125,7 @@ object CropImage {
       dest.writeParcelable(wholeImageRect, flags)
       dest.writeInt(rotation)
       dest.writeInt(sampleSize)
+      dest.writeInt(if (isViewOnce) 1 else 0)
     }
 
     override fun describeContents(): Int = 0

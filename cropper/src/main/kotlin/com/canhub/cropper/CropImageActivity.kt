@@ -388,6 +388,7 @@ open class CropImageActivity :
       rotation = cropImageView?.rotatedDegrees ?: 0,
       wholeImageRect = cropImageView?.wholeImageRect,
       sampleSize = sampleSize,
+      isViewOnce = isViewOnceActive,
     )
     val intent = Intent()
     intent.extras?.let(intent::putExtras)

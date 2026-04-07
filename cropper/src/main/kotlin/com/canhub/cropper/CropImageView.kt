@@ -1746,6 +1746,8 @@ class CropImageView @JvmOverloads constructor(
     val rotation: Int,
     /** Sample size used creating the crop bitmap to lower its size. */
     val sampleSize: Int,
+    /** Whether the user selected "view once" mode. */
+    val isViewOnce: Boolean = false,
   ) {
     val isSuccessful: Boolean
       get() = error == null
