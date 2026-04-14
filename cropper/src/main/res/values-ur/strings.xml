@@ -9,5 +9,13 @@
   <string name="pick_image_chooser_title">ذریعہ منتخب کریں</string>
   <string name="pick_image_camera">کیمرہ</string>
   <string name="pick_image_gallery">گالری</string>
-  <string name="send_image_to_chat">چیٹ میں تصویر بھیجیں</string>
+  <string name="permission_required_text">اجازت درکار ہے</string>
+  <string name="camera_permission_text">اس فیچر کے لیے کیمرہ کی اجازت ضروری ہے۔ براہِ کرم اسے سیٹنگز میں جا کر فعال کریں۔</string>
+  <string name="go_to_setting">سیٹنگز کھولیں</string>
+  <string name="cancel">منسوخ کریں</string>
+  <string name="photo_is_small">تصویر بہت چھوٹی ہے</string>
+  <string name="this_photo_didn_t_meet_requirement">یہ تصویر کم از کم سائز کی شرط پوری نہیں کرتی۔ براہِ کرم دوبارہ کوشش کریں۔</string>
+  <string name="got_it">ٹھیک ہے</string>
+  <string name="send_image_to_chat">تصویر چیٹ میں بھیجیں</string>
+  <string name="view_once_enabled">ایک بار دیکھنے کی سہولت فعال ہو گئی!</string>
 </resources>

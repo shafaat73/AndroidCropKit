@@ -12,7 +12,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.Menu
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -169,6 +172,9 @@ open class CropImageActivity :
     binding.btnViewOnce.setOnClickListener {
       isViewOnceActive = !isViewOnceActive
       updateViewOnceButtonState()
+      if (isViewOnceActive) {
+        showViewOnceToast()
+      }
     }
 
     binding.btnOk.setOnClickListener {
@@ -214,6 +220,17 @@ open class CropImageActivity :
       binding.btnViewOnce.drawable?.colorFilter =
         PorterDuffColorFilter("#C81262".toColorInt(), PorterDuff.Mode.SRC_IN)
     }
+  }
+
+  @Suppress("DEPRECATION")
+  private fun showViewOnceToast() {
+    val inflater = LayoutInflater.from(this)
+    val layout = inflater.inflate(R.layout.toast_view_once, null)
+    val toast = Toast(this)
+    toast.duration = Toast.LENGTH_SHORT
+    toast.view = layout
+    toast.setGravity(Gravity.CENTER, 0, 0)
+    toast.show()
   }
 
   private fun showIntentChooser() {

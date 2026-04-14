@@ -97,6 +97,7 @@ internal class SampleCropFragment : Fragment() {
           imageSourceIncludeGallery = includeGallery,
           minCropWindowHeight = 800,
           minCropWindowWidth = 800,
+          openFromChat = true
         ),
       ),
     )
